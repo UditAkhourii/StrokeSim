@@ -30,6 +30,27 @@ def main():
     df['dissoc'] = df.dli - df.mn9_ratio                     # <0: reward lost beyond motor
     df.to_csv(E2 / 'atlas_summary.csv', index=False)
 
+    # ---- hit screen: outside the random-control range AND |z| > 3 vs intact ----
+    # SEZ_DA is relabelled SEZ-MA (3/9 are immuno-confirmed serotonergic; not a clean DA index)
+    rnd = df[df.type == 'random']
+    hits = []
+    if len(rnd):
+        for metric, zcol in [('mn9_ratio', 'mn9_z'), ('dli', 'sez_z'), ('pam_dv_uV', None)]:
+            lo, hi = rnd[metric].min(), rnd[metric].max()
+            out = (df[metric] < lo) | (df[metric] > hi)
+            if zcol:
+                out &= df[zcol].abs() > 3
+            for c in df[out & (df.type != 'random')].cond:
+                hits.append((c, metric))
+        h = pd.DataFrame(hits, columns=['cond', 'metric'])
+        h = h.groupby('cond').metric.apply(lambda x: ','.join(sorted(set(x)))).reset_index()
+        h.to_csv(E2 / 'hits.csv', index=False)
+        print('random-control ranges:', {m: (round(rnd[m].min(), 3), round(rnd[m].max(), 3))
+                                         for m in ['mn9_ratio', 'dli', 'pam_dv_uV']})
+        print(f'\n=== HITS ({len(h)}) ===')
+        print(h.merge(df, on='cond')[['cond', 'metric', 'n_run', 'n_silenced', 'mn9_ratio', 'dli',
+                                      'pam_dv_uV', 'active_neurons']].round(2).to_string(index=False))
+
     print(f"intact: MN9 {base.mn9:.1f} Hz, SEZ_DA {base.sez_da:.1f} Hz, PAM dv {base.pam_dv*1000:.2f} uV, "
           f"active {base.active_neurons}")
     cols = ['cond', 'n_silenced', 'syn_removed', 'mn9_ratio', 'dli', 'dissoc', 'pam_dv_uV', 'active_neurons']
@@ -68,7 +89,7 @@ def main():
     lim = [-0.05, max(1.3, df[['mn9_ratio', 'dli']].max().max() + .05)]
     ax[0].plot(lim, lim, color='#ccc', lw=1, zorder=0)
     ax[0].axvline(1, color='#eee', lw=1, zorder=0); ax[0].axhline(1, color='#eee', lw=1, zorder=0)
-    ax[0].set(xlim=lim, ylim=lim, xlabel='MN9 (motor) / intact', ylabel='SEZ_DA (DLI) / intact',
+    ax[0].set(xlim=lim, ylim=lim, xlabel='MN9 (motor) / intact', ylabel='SEZ-MA / intact',
               title='Lesion effects: reward vs motor')
     ax[0].legend(frameon=False, fontsize=8)
 
@@ -77,13 +98,13 @@ def main():
     d = d[(d.worst < 0.95) | (d.dli > 1.05) | (d.mn9_ratio > 1.05)].sort_values('worst')
     y = np.arange(len(d))
     ax[1].barh(y - .2, d.mn9_ratio, .4, color='#a44a3f', label='MN9')
-    ax[1].barh(y + .2, d.dli, .4, color='#2a6f97', label='SEZ_DA')
+    ax[1].barh(y + .2, d.dli, .4, color='#2a6f97', label='SEZ-MA')
     ax[1].set_yticks(y, d.region, fontsize=7); ax[1].invert_yaxis(); ax[1].axvline(1, color='#999', lw=1)
     ax[1].set(xlabel='readout / intact', title='Tissue lesions with >5% effect'); ax[1].legend(frameon=False, fontsize=8)
 
     for t, col, mk in [('neuron', '#a44a3f', 's'), ('random', '#888888', '^')]:
         d = df[df.type == t]
-        ax[2].scatter(d.n_silenced, 1 - d.dli, s=22, c=col, marker=mk, label=f'{t}: SEZ_DA loss')
+        ax[2].scatter(d.n_silenced, 1 - d.dli, s=22, c=col, marker=mk, label=f'{t}: SEZ-MA loss')
         ax[2].scatter(d.n_silenced, 1 - d.mn9_ratio, s=22, facecolors='none', edgecolors=col, marker=mk,
                       label=f'{t}: MN9 loss')
     ax[2].set(xscale='log', xlabel='# neurons silenced', ylabel='fractional loss',
