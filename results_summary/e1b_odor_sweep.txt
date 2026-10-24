@@ -1,0 +1,20 @@
+# 200 ms single trials, v783, new PoissonGroup drive. format: mode odor rate inputs active PN LN KC MBON DAN
+orn DA2        60Hz in= 39 active= 7878  PN 547/685  LN 359/429  KC 3274/5177  MBON 67/96  DAN 138/331
+orn DA2        70Hz in= 39 active= 7885  PN 543/685  LN 358/429  KC 3295/5177  MBON 67/96  DAN 137/331
+orn DA2        80Hz in= 39 active= 7992  PN 548/685  LN 359/429  KC 3299/5177  MBON 67/96  DAN 140/331
+orn DA2        90Hz in= 39 active= 8016  PN 547/685  LN 360/429  KC 3308/5177  MBON 67/96  DAN 137/331
+orn vinegar    20Hz in=145 active= 8152  PN 551/685  LN 359/429  KC 3322/5177  MBON 66/96  DAN 140/331
+orn vinegar    30Hz in=145 active= 8220  PN 552/685  LN 359/429  KC 3343/5177  MBON 67/96  DAN 143/331
+orn vinegar    40Hz in=145 active= 8263  PN 551/685  LN 360/429  KC 3349/5177  MBON 66/96  DAN 142/331
+orn broad      15Hz in=592 active= 8574  PN 554/685  LN 361/429  KC 3345/5177  MBON 66/96  DAN 141/331
+orn broad      25Hz in=592 active= 8641  PN 551/685  LN 361/429  KC 3375/5177  MBON 66/96  DAN 142/331
+pn vinegar   150Hz in= 10 active= 8333  PN 557/685  LN 358/429  KC 3465/5177  MBON 65/96  DAN 147/331
+pn broad     100Hz in= 37 active= 8824  PN 561/685  LN 365/429  KC 3709/5177  MBON 69/96  DAN 164/331
+pn broad     150Hz in= 37 active= 8946  PN 561/685  LN 366/429  KC 3737/5177  MBON 71/96  DAN 169/331
+orn     5Hz in= 39 active=   23  PN 0/685  LN 0/429  KC 0/5177  MBON 0/96  DAN 0/331
+orn    10Hz in= 39 active=   35  PN 0/685  LN 0/429  KC 0/5177  MBON 0/96  DAN 0/331
+orn    20Hz in= 39 active=   39  PN 0/685  LN 0/429  KC 0/5177  MBON 0/96  DAN 0/331
+orn    50Hz in= 39 active=   52  PN 7/685  LN 4/429  KC 0/5177  MBON 0/96  DAN 0/331
+pn    50Hz in= 11 active=   33  PN 11/685  LN 1/429  KC 0/5177  MBON 0/96  DAN 0/331
+pn   100Hz in= 11 active=   60  PN 12/685  LN 1/429  KC 0/5177  MBON 0/96  DAN 1/331
+pn   150Hz in= 11 active=   96  PN 13/685  LN 2/429  KC 6/5177  MBON 0/96  DAN 2/331

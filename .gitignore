@@ -1,5 +1,12 @@
 .venv/
-external/
-results/
 __pycache__/
+*.pyc
+.DS_Store
+*.part
+
+# large / external data (fetch with scripts/download_data.sh)
 data/
+external/
+
+# full simulation outputs (small paper-backing summaries live in results_summary/)
+results/

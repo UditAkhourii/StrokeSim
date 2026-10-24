@@ -1,0 +1,22 @@
+[project]
+name = "ffsim"
+version = "0.1.0"
+description = "Stroke-like lesion experiments in a whole-brain Drosophila LIF model (FlyWire connectome)"
+authors = [{ name = "Udit Akhouri", email = "udit@exthalpy.com" }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "brian2==2.9.0",
+  "numpy==2.3.5",
+  "cython==3.3.0",
+  "pandas==3.1.0",
+  "pyarrow==26.0.0",
+  "scipy==1.17.1",
+  "sympy==1.14.0",
+  "joblib==1.6.0",
+  "matplotlib==3.11.2",
+]
+
+[tool.setuptools]
+packages = ["ffsim"]

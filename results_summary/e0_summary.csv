@@ -1,0 +1,6 @@
+exp,r_poi_Hz,spikes,active_neurons,MN9_Hz,MN9_sd
+sugarR_20Hz,20.0,18611,77,0.0,0.2
+sugarR_50Hz,50.0,95076,351,20.6,5.6
+sugarR_100Hz,100.0,292808,412,69.4,5.9
+sugarR_150Hz,150.0,415105,443,85.2,5.0
+sugarR_200Hz,200.0,509381,455,92.5,4.7

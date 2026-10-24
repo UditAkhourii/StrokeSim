@@ -1,0 +1,10 @@
+# Versions used for all results (Python 3.11.5, macOS arm64).
+brian2==2.9.0
+numpy==2.3.5        # must stay <2.4: brian2 2.9.0 calls ndarray.ptp, removed in numpy 2.4
+cython==3.3.0       # brian2 cython code generation
+pandas==3.1.0
+pyarrow==26.0.0
+scipy==1.17.1
+sympy==1.14.0
+joblib==1.6.0
+matplotlib==3.11.2

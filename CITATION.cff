@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below, and also cite Shiu et al. (2024) and the FlyWire papers."
+title: "A single relay neuron decides the serotonergic cost of stroke in a whole-brain fly model"
+type: software
+authors:
+  - family-names: Akhouri
+    given-names: Udit
+    affiliation: Lossfunk
+    email: udit@exthalpy.com
+license: MIT
+date-released: 2026-10-25
+keywords: [Drosophila, connectome, FlyWire, leaky integrate-and-fire, Brian2, stroke, lesion, serotonin]
+references:
+  - type: article
+    title: "A Drosophila computational brain model reveals sensorimotor processing"
+    authors:
+      - family-names: Shiu
+        given-names: Philip K.
+    journal: Nature
+    year: 2024
+    doi: 10.1038/s41586-024-07763-9
+  - type: article
+    title: "Whole-brain annotation and multi-connectome cell typing of Drosophila"
+    authors:
+      - family-names: Schlegel
+        given-names: Philipp
+    journal: Nature
+    year: 2024
+    doi: 10.1038/s41586-024-07686-5
+  - type: article
+    title: "Neuronal wiring diagram of an adult brain"
+    authors:
+      - family-names: Dorkenwald
+        given-names: Sven
+    journal: Nature
+    year: 2024
+    doi: 10.1038/s41586-024-07558-y
