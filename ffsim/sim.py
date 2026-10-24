@@ -13,8 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SHIU = ROOT / 'external' / 'Drosophila_brain_model'
 sys.path.insert(0, str(SHIU))
 
-from brian2 import Network, mV  # noqa: E402
-from model import create_model, poi, default_params  # noqa: E402
+from brian2 import Network, PoissonGroup, StateMonitor, Synapses, mV, ms  # noqa: E402
+from model import create_model, default_params  # noqa: E402
 
 V630 = {
     'path_comp': SHIU / '2023_03_23_completeness_630_final.csv',
@@ -26,10 +26,28 @@ V783 = {
 }
 
 
-def run(exc_ids, params=None, slnc_ids=(), data=V630, n_run=None, verbose=True):
+def poisson_drive(neu, exc, params):
+    """Poisson input to neurons exc, equivalent to Shiu's per-neuron PoissonInput(N=1).
+
+    One PoissonGroup + one Synapses object: rate is a runtime variable, so changing
+    the rate or the input set does not trigger Cython recompilation (PoissonInput
+    bakes the rate into generated code and compiles one module per target neuron).
+    """
+    pg = PoissonGroup(len(exc), rates=params['r_poi'], name='poisson_drive')
+    syn = Synapses(pg, neu, 'w_poi : volt', on_pre='v += w_poi', name='poisson_syn')
+    syn.connect(i=list(range(len(exc))), j=list(exc))
+    syn.w_poi = params['w_syn'] * params['f_poi']
+    neu.rfc[list(exc)] = 0 * ms  # no refractory period for Poisson targets (as Shiu)
+    return [pg, syn]
+
+
+def run(exc_ids, params=None, slnc_ids=(), data=V630, n_run=None, verbose=True,
+        record_v=()):
     """Run n_run trials exciting exc_ids, silencing slnc_ids (FlyWire IDs).
 
     Returns spike DataFrame with columns t, trial, flywire_id.
+    If record_v (FlyWire IDs) is given, also returns a DataFrame of mean
+    depolarisation above rest (mV, 1 ms sampling) per neuron and trial.
     """
     params = dict(default_params if params is None else params)
     n_run = params['n_run'] if n_run is None else n_run
@@ -40,19 +58,24 @@ def run(exc_ids, params=None, slnc_ids=(), data=V630, n_run=None, verbose=True):
 
     t0 = time()
     neu, syn, spk_mon = create_model(data['path_comp'], data['path_con'], params)
-    pois, neu = poi(neu, [flyid2i[f] for f in exc_ids], [], params)
+    pois = poisson_drive(neu, [flyid2i[f] for f in exc_ids], params)
     if slnc_ids:
         slnc = set(flyid2i[f] for f in slnc_ids)
         mask = pd.Series(syn.i[:]).isin(slnc).values
         w = syn.w[:]
         w[mask] = 0 * mV
         syn.w[:] = w
-    net = Network(neu, syn, spk_mon, *pois)
+    objs = [neu, syn, spk_mon, *pois]
+    if record_v:
+        v_ids = [f for f in record_v if f in flyid2i]
+        v_mon = StateMonitor(neu, 'v', record=[flyid2i[f] for f in v_ids], dt=1 * ms)
+        objs.append(v_mon)
+    net = Network(*objs)
     net.store('init')
     if verbose:
         print(f'    build: {time() - t0:.1f} s')
 
-    rows = []
+    rows, v_rows = [], []
     for trial in range(n_run):
         t1 = time()
         net.restore('init')
@@ -60,9 +83,15 @@ def run(exc_ids, params=None, slnc_ids=(), data=V630, n_run=None, verbose=True):
         i, t = spk_mon.i[:], spk_mon.t[:]
         rows.append(pd.DataFrame({'t': t.astype(float),
                                   'trial': trial, 'flywire_id': i2flyid[i]}))
+        if record_v:
+            dv = (v_mon.v[:] - params['v_0']).mean(axis=1) / mV
+            v_rows.append(pd.DataFrame({'flywire_id': v_ids, 'trial': trial, 'dv_mV': dv}))
         if verbose:
             print(f'    trial {trial + 1}/{n_run}: {len(i)} spikes, {time() - t1:.1f} s', flush=True)
-    return pd.concat(rows, ignore_index=True)
+    df_spk = pd.concat(rows, ignore_index=True)
+    if record_v:
+        return df_spk, pd.concat(v_rows, ignore_index=True)
+    return df_spk
 
 
 def rates(df_spk, t_run_s, n_run):
