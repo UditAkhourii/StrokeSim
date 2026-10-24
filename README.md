@@ -18,7 +18,7 @@ monoaminergic cells of the subesophageal zone (SEZ).
    abolishes it.
 2. **A PRW stroke selectively removes a serotonergic signal.** Lesioning the prow (PRW, 402 neurons)
    silences three serotonergic SEZ neurons (CB0262 and two CB0892) while MN9 is spared.
-   0 of 19 size-matched random lesions reproduce this.
+   0 of 22 size-matched random lesions reproduce this.
 3. **One relay neuron carries it.** Silencing a single neuron, CB0246
    (FlyWire `720575940632602532`), abolishes the serotonergic response (all three cells at 0 Hz,
    MN9 64.6 Hz). The result replicates on the v630 connectome and across W_syn = 0.25–0.35 mV.
