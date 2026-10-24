@@ -2,3 +2,4 @@
 external/
 results/
 __pycache__/
+data/

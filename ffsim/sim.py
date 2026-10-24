@@ -20,6 +20,10 @@ V630 = {
     'path_comp': SHIU / '2023_03_23_completeness_630_final.csv',
     'path_con': SHIU / '2023_03_23_connectivity_630_final.parquet',
 }
+V783 = {
+    'path_comp': SHIU / 'Completeness_783.csv',
+    'path_con': SHIU / 'Connectivity_783.parquet',
+}
 
 
 def run(exc_ids, params=None, slnc_ids=(), data=V630, n_run=None, verbose=True):
