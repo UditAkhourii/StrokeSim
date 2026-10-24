@@ -26,12 +26,15 @@ from experiments.e0_baseline import NEU_SUGAR, ID_MN9  # noqa: E402
 
 OUT = ROOT / 'results' / 'a1'
 MIN_NEURONS = 10
+OPTIC = ('ME_', 'LO_', 'LOP_', 'LA_', 'AME_', 'OCG')  # visual; irrelevant to taste, ~90k neurons
+RANDOM_SIZES = [50, 200, 1000, 5000]
+RANDOM_SEEDS = [0, 1]
 RUNAWAY_N = 5000
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--n-run', type=int, default=20)
+    ap.add_argument('--n-run', type=int, default=5)
     ap.add_argument('--only', nargs='*')
     args = ap.parse_args()
     (OUT / 'cond').mkdir(parents=True, exist_ok=True)
@@ -47,7 +50,10 @@ def main():
 
     npt = load_neuropil()
     sizes = npt[npt.frac >= 0.5].groupby('neuropil').size()
-    neuropils = ['INTACT'] + sorted(sizes[sizes >= MIN_NEURONS].index.drop('None', errors='ignore'))
+    neuropils = sorted(n for n in sizes[sizes >= MIN_NEURONS].index if n != 'None' and not n.startswith(OPTIC))
+    randoms = [f'RANDOM_{n}_s{s}' for n in RANDOM_SIZES for s in RANDOM_SEEDS]
+    neuropils = ['INTACT'] + neuropils + randoms
+    pool = sorted(ids - spare)
 
     params = dict(default_params)
     params.update(r_poi=100 * Hz, n_run=args.n_run)
@@ -57,7 +63,13 @@ def main():
         f_out = OUT / 'cond' / f'{npl}.csv'
         if f_out.exists():
             continue
-        les = [] if npl == 'INTACT' else neuropil_lesion(npl, npt, spare=spare)
+        if npl == 'INTACT':
+            les = []
+        elif npl.startswith('RANDOM_'):
+            _, n, sd = npl.split('_')
+            les = list(pd.Series(pool).sample(int(n), random_state=int(sd[1:])))
+        else:
+            les = neuropil_lesion(npl, npt, spare=spare)
         print(f'>>> {npl}: lesion {len(les)} neurons', flush=True)
         df, dv = run(sugar, params, slnc_ids=les, data=V783, record_v=pam, verbose=False)
         rt = rates(df, float(params['t_run'] / second), args.n_run)

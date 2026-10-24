@@ -43,7 +43,7 @@ def poisson_drive(neu, exc, params):
 
 
 def run(exc_ids, params=None, slnc_ids=(), data=V630, n_run=None, verbose=True,
-        record_v=(), w_scale=None):
+        record_v=(), w_scale=None, scale_ids=(), scale_factor=1.0):
     """Run n_run trials exciting exc_ids, silencing slnc_ids (FlyWire IDs).
 
     Returns spike DataFrame with columns t, trial, flywire_id.
@@ -51,6 +51,8 @@ def run(exc_ids, params=None, slnc_ids=(), data=V630, n_run=None, verbose=True,
     depolarisation above rest (mV, 1 ms sampling) per neuron and trial.
     w_scale: optional array aligned to the rows of data['path_con']; multiplies
     each connection's weight (tissue lesions).
+    scale_ids / scale_factor: outgoing weights of scale_ids are multiplied by
+    scale_factor (partial loss, e.g. stroke penumbra); applied like silencing.
     """
     params = dict(default_params if params is None else params)
     n_run = params['n_run'] if n_run is None else n_run
@@ -72,6 +74,12 @@ def run(exc_ids, params=None, slnc_ids=(), data=V630, n_run=None, verbose=True,
         mask = pd.Series(syn.i[:]).isin(slnc).values
         w = syn.w[:]
         w[mask] = 0 * mV
+        syn.w[:] = w
+    if scale_ids and scale_factor != 1.0:
+        scl = set(flyid2i[f] for f in scale_ids)
+        mask = pd.Series(syn.i[:]).isin(scl).values
+        w = syn.w[:]
+        w[mask] = w[mask] * scale_factor
         syn.w[:] = w
     objs = [neu, syn, spk_mon, *pois]
     if record_v:
@@ -135,7 +143,7 @@ class Model:
         self.net = Network(*objs)
         self.net.store('pristine')  # empty monitors, t=0, intact weights
 
-    def run(self, w_scale=None, slnc_ids=(), n_run=None):
+    def run(self, w_scale=None, slnc_ids=(), n_run=None, scale_ids=(), scale_factor=1.0):
         """Returns (spike DataFrame, Vm DataFrame or None) for the given lesion."""
         n_run = self.params['n_run'] if n_run is None else n_run
         # local names must not collide with model variables (brian2 resolves the caller namespace)
@@ -144,6 +152,10 @@ class Model:
             mask = np.isin(self.pre, [self.flyid2i[f] for f in slnc_ids])
             w_new = w_new.copy()
             w_new[mask] = 0 * mV
+        if scale_ids and scale_factor != 1.0:
+            mask = np.isin(self.pre, [self.flyid2i[f] for f in scale_ids])
+            w_new = w_new.copy()
+            w_new[mask] = w_new[mask] * scale_factor
         self.net.restore('pristine')
         self.syn.w[:] = w_new
         self.net.store('init')

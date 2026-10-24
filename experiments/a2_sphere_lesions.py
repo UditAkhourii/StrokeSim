@@ -25,7 +25,7 @@ from ffsim.lesion import (load_neuropil, load_positions, neuropil_centroids,  # 
 from experiments.e0_baseline import NEU_SUGAR, ID_MN9  # noqa: E402
 
 OUT = ROOT / 'results' / 'a2'
-RADII = [10, 20, 30]      # um
+RADII = [20, 30, 45, 60]
 PEN_K = 1.5               # penumbra outer radius / core radius
 PEN_FACTOR = 0.5          # penumbra outgoing-weight scale
 N_RANDOM_SEEDS = 1
@@ -91,7 +91,10 @@ def main():
         print(f">>> {c['cond']}: core {len(c['core'])}, penumbra {len(c['pen'])}", flush=True)
         df, dv = run(sugar, params, slnc_ids=c['core'], data=V783, record_v=pam, verbose=False,
                      scale_ids=c['pen'], scale_factor=PEN_FACTOR)
-        r = rates(df, float(params['t_run'] / second), args.n_run).r
+        rt = rates(df, float(params['t_run'] / second), args.n_run)
+        (OUT / 'rates').mkdir(parents=True, exist_ok=True)
+        rt.to_csv(OUT / 'rates' / f"{c['cond']}.csv")
+        r = rt.r
         act = r[r > 1.0]
         pd.DataFrame([{
             'cond': c['cond'], 'center': c['center'], 'radius_um': c['radius'],
