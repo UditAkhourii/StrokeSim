@@ -10,3 +10,6 @@ external/
 
 # full simulation outputs (small paper-backing summaries live in results_summary/)
 results/
+
+# run logs
+*.log

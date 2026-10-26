@@ -37,3 +37,11 @@ fetch "$Z/proofread_connections_783.feather?download=1" data/flywire783/proofrea
 # 4. Derived neuron x neuropil table used by ffsim.lesion
 PY="${PYTHON:-.venv/bin/python}"
 "$PY" -I scripts/build_neuropil_table.py
+
+# 5. Optional: Janelia male CNS v1.0 flat connectome (about 1.1 GB) for experiments/k6*
+if [ "${MALECNS:-0}" = 1 ]; then
+  M=https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome
+  fetch "$M/body-annotations-male-cns-v1.0-minconf-0.5.feather" data/malecns/ann.feather
+  fetch "$M/body-neurotransmitters-male-cns-v1.0.feather" data/malecns/nt.feather
+  fetch "$M/connectome-weights-male-cns-v1.0-minconf-0.5.feather" data/malecns/weights.feather
+fi

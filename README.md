@@ -46,7 +46,9 @@ Notes on dependencies:
 - **`numpy<2.4`** is required. Brian2 2.9.0 calls `ndarray.ptp`, which numpy 2.4 removed.
   `requirements.txt` pins the exact versions used (numpy 2.3.5).
 - **Cython** is needed for Brian2's `cython` code-generation target. The first run per connectome
-  version compiles the network (about 15 min); later runs reuse the cache.
+  version compiles the network (about 15 min); later runs reuse the cache. On macOS, if clang cannot
+  find `<cstdlib>`, Brian2 silently falls back to the slower numpy target; set
+  `CPLUS_INCLUDE_PATH=$(xcrun --show-sdk-path)/usr/include/c++/v1`.
 
 All scripts are run from the repo root and resolve paths relative to it.
 
@@ -99,6 +101,29 @@ results_summary/  small CSVs behind the paper's numbers (full outputs go to resu
 Exact commands, in order, are in [REPRODUCE.md](REPRODUCE.md). `results_summary/` holds the small
 CSVs that back the numbers above, including `a1b_random400_null.csv` (MN9 and 5-HT rates per random
 seed).
+
+## Follow-up: stress test of the CB0246 result
+
+Scripts `s3*`, `k1` to `k6b` re-test Findings 2 and 3. Unless noted: v783, default W_syn, sugar GRNs at
+100 Hz; "serotonin cells" = all 6 immuno-serotonergic SEZ cells (CB0262, CB0212, CB0892; L and R),
+which the male CNS annotators label as the sugar-SELs of Yao and Scott (2022). Summaries are in
+`results_summary/` (file prefix = script).
+
+| Script | Test | Result |
+|---|---|---|
+| `s3_dissect_roundnull.py`, `s3b_seed3_causal.py` | Round-stroke null seed 3 (serotonin 0.3 Hz) | Only seed that hits CB0246 (penumbra); random-lesion count is 1/22 |
+| `k1_knockout_screen.py` | Silence each of the 402 PRW neurons | 3 confirmed hits: CB0246 L (0%), CB0883 L (8%), CB0559 R (35%) |
+| `k2_bilateral.py` | CB0246 twin (49.86% in PRW, outside the 50% lesion) | Twin alone leaves 23 to 33% |
+| `k3_bilateral_sugar.py` | The 21 sugar GRNs are all left; add 21 type-matched right GRNs | CB0246 L still leaves 2% |
+| `k4_robust_mirror.py`, `k4b_mirror_all_right.py` | Weight noise (lognormal, 10 seeds); right-only input | CB0246 L leaves 1 to 10% in 10/10; with right input both twins leave 52% |
+| `k5_controls.py` | PRW cutoff 30 to 70%; pairwise chain knockouts; 200 round strokes | Serotonin loss at every cutoff; 4/200 strokes hit the rule (serotonin < 25%, positioning > 85%), all 4 hit the chain, 0/192 that miss it |
+| `k6_malecns.py`, `k6b_malecns_calibrated.py` | Same lesions in the Janelia male CNS | Both CB0246 silenced: 0%; single twins 22 to 45% (right stronger) |
+
+Two readout notes. MN9 drives rostrum lifting only (Schwarz et al. 2017); the pharyngeal pump motor
+neurons (MN10, MNx01, CB0700, CB0708) drop 30 to 55% when CB0246 L is silenced and to 0% after the PRW
+lesion, while proboscis-positioning motor neurons are unchanged. The male CNS model is built by
+`scripts/build_malecns_model.py` (traced bodies, edges with at least 2 synapses, 15.3M edges) and is
+active only above about 0.6x the default W_syn, with broader activity than the FlyWire model.
 
 ## Runtime and memory
 
