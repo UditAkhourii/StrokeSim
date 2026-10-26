@@ -95,6 +95,25 @@ $PY experiments/stroke_analysis.py
 $PY experiments/a5r_replication.py                     # also compiles v630 if not cached
 ```
 
+## Follow-up: CB0246 stress test
+
+K1 to K5 write to `results/k*/`; K2, K4 and K5 reuse definitions from K1 to K3, so run in order.
+
+```bash
+$PY experiments/s3_dissect_roundnull.py         # structural, no simulation
+$PY experiments/s3b_seed3_causal.py             # 5 conditions x 20 trials
+$PY experiments/k1_knockout_screen.py           # 403 conditions x 5 trials + 20-trial confirmation
+$PY experiments/k2_bilateral.py                 # 5 x 20
+$PY experiments/k3_bilateral_sugar.py           # 7 x 20, sugar on both sides
+$PY experiments/k4_robust_mirror.py             # 20 x 10 (weight noise) + 3 x 20 (right only)
+$PY experiments/k4b_mirror_all_right.py         # 3 x 20
+$PY experiments/k5_controls.py                  # cutoffs, 21 pair conditions, 200 strokes x 5 trials
+# second connectome: MALECNS=1 scripts/download_data.sh, then
+$PY scripts/build_malecns_model.py build 2
+$PY experiments/k6_malecns.py
+$PY experiments/k6b_malecns_calibrated.py
+```
+
 ## Paper numbers → files
 
 The `results_summary/` copies of: `e0/summary.csv`, `n1/summary.csv`, `a1/atlas.csv`,
