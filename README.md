@@ -171,6 +171,7 @@ which the male CNS annotators label as the sugar-SELs of Yao and Scott (2022). S
 | `k4_robust_mirror.py`, `k4b_mirror_all_right.py` | Weight noise (lognormal, 10 seeds); right-only input | CB0246 L leaves 1 to 10% in 10/10; with right input both twins leave 52% |
 | `k5_controls.py` | PRW cutoff 30 to 70%; pairwise chain knockouts; 200 round strokes | Serotonin loss at every cutoff; 4/200 strokes hit the rule (serotonin < 25%, positioning > 85%), all 4 hit the chain, 0/192 that miss it |
 | `k6_malecns.py`, `k6b_malecns_calibrated.py` | Same lesions in the Janelia male CNS | Both CB0246 silenced: 0%; single twins 22 to 45% (right stronger) |
+| `p1_static_paths.py` | Static map only: rank inputs by synapse-weighted sugar→5-HT paths (≤3 hops) | CB0246 ranks 1st (direct) or 3rd–4th (paths) of 402 PRW neurons, but the map can't tell hits from duds: Spearman vs knockout effect 0.03–0.07; top path pick CB1366 raises 5-HT 35% |
 
 Two readout notes. MN9 drives rostrum lifting only (Schwarz et al. 2017); the pharyngeal pump motor
 neurons (MN10, MNx01, CB0700, CB0708) drop 30 to 55% when CB0246 L is silenced and to 0% after the PRW

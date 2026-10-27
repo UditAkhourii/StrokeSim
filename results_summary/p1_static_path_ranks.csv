@@ -1,0 +1,10 @@
+weights,paths,max_hops,CB0246_rank_all_neurons,n_scored,CB0246_rank_5HT_inputs,n_5HT_inputs,CB0246_rank_PRW,CB0246_share_of_paths,KO_hits_in_PRW_top3,spearman_vs_KO
+synapses,all,2,,53.0,,866,,0.0,1,0.0332089380190361
+synapses,all,3,4.0,919.0,4.0,866,4.0,,1,0.02701854195247306
+synapses,exc,2,,34.0,,866,,0.0,1,0.05728118939560771
+synapses,exc,3,3.0,540.0,3.0,866,3.0,,2,0.05902316167526496
+input_frac,all,2,,53.0,,866,,0.0,1,0.03322706371258236
+input_frac,all,3,17.0,919.0,13.0,866,4.0,,1,0.02667111205638247
+input_frac,exc,2,,34.0,,866,,0.0,1,0.05705690645431164
+input_frac,exc,3,9.0,540.0,8.0,866,3.0,,2,0.05825248548707516
+synapses,direct,1,,,3.0,866,1.0,,1,0.06812437630934036
