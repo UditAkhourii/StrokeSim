@@ -1,0 +1,5 @@
+score,spearman_vs_effect,hit_ranks_of_402,hits_in_top5,hits_in_top10,n_nonzero
+static_paths,0.05902316167526496,"[2, 3, 7]",2,3,67
+active_rate,0.04636727510375597,"[2, 3, 5]",3,3,21
+act_direct,0.157980078535066,"[1, 2, 9]",2,3,19
+act_paths,0.18129116436438952,"[1, 2, 6]",2,3,20

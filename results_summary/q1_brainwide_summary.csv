@@ -1,0 +1,4 @@
+knockout,active_intact,active_ko,n_changed,n_down,n_up,frac_changed,sum_abs_delta_Hz,by_super_class
+CB0246,353,344,48,47,1,0.1307901907356948,1078.1,"{'central': 33, 'motor': 10, 'sensory': 5}"
+CB0208,354,364,3,0,3,0.008152173913043478,476.2,{'central': 3}
+CB1366_x2,354,364,2,0,2,0.005449591280653951,361.2,{'central': 2}
