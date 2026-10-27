@@ -8,7 +8,8 @@ authors:
     affiliation: Lossfunk
     email: udit@exthalpy.com
 license: MIT
-date-released: 2026-10-25
+date-released: 2026-10-27
+repository-code: "https://github.com/UditAkhourii/StrokeSim"
 keywords: [Drosophila, connectome, FlyWire, leaky integrate-and-fire, Brian2, stroke, lesion, serotonin]
 references:
   - type: article

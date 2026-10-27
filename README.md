@@ -1,40 +1,90 @@
-# ffsim — stroke-like lesions in a whole-brain fly model
+# StrokeSim
 
-Code for **"A single relay neuron decides the serotonergic cost of stroke in a whole-brain fly model"**
-(Udit Akhouri, Lossfunk).
+**A single neuron links stroke to serotonin loss in a whole-brain fruit fly model.**
 
-We take the whole-brain leaky integrate-and-fire (LIF) model of *Drosophila* by
-[Shiu et al. (2024)](https://doi.org/10.1038/s41586-024-07763-9), run on the FlyWire connectome
-(v783; v630 for replication), and apply stroke-like lesions: silencing all neurons that live in a
-neuropil, removing all synapses inside a neuropil ("tissue" lesions), spherical focal lesions with a
-penumbra, and size-matched random controls. Sugar gustatory receptor neurons (GRNs) are stimulated
-at 100 Hz; readouts are the proboscis-extension motor neuron MN9 (feeding) and serotonergic /
-monoaminergic cells of the subesophageal zone (SEZ).
+An open research project by Udit Akhouri (Lossfunk). We put simulated strokes
+into a full-brain model of *Drosophila*, built from the FlyWire wiring diagram, and ask which damage
+changes what the brain does. All code, small result tables and figures are here. Everything can be
+re-run on a laptop.
 
-## Key findings
+<p align="center">
+  <a href="docs/media/FruitFlyBrain.mp4"><img src="docs/media/FruitFlyBrain.gif" width="760" alt="Animation: sugar drives feeding (MN9) and three serotonin cells through the relay neuron CB0246; a stroke on PRW that cuts CB0246 leaves feeding intact but silences the serotonin response"></a>
+  <br><sub>10 s explainer. Click for the MP4.</sub>
+</p>
 
-1. **Feeding is robust; the GNG is a single point of failure.** MN9 sugar responses survive neuron
-   lesions of 49 of 51 neuropils and almost all tissue lesions. Lesioning the gnathal ganglion (GNG)
-   abolishes it.
-2. **A PRW stroke selectively removes a serotonergic signal.** Lesioning the prow (PRW, 402 neurons)
-   silences three serotonergic SEZ neurons (CB0262 and two CB0892) while MN9 is spared.
-   0 of 22 size-matched random lesions reproduce this.
-3. **One relay neuron carries it.** Silencing a single neuron, CB0246
-   (FlyWire `720575940632602532`), abolishes the serotonergic response (all three cells at 0 Hz,
-   MN9 64.6 Hz). The result replicates on the v630 connectome and across W_syn = 0.25–0.35 mV.
-4. **Model audit.** PAM dopaminergic neurons are not recruited by taste input. Raising the global
-   synaptic weight recruits them only through valence-blind whole-brain ignition (W_syn ≥ 0.49 mV).
-   The olfactory subnetwork shows all-or-none ignition.
+## The question
+
+After a stroke, about one in three people develop depression. Human lesion studies suggest that it
+depends less on *where* the stroke lands than on *which connections* it cuts. Human brain maps are
+too coarse to test that at the level of single cells. The fly brain is the first adult brain mapped
+synapse by synapse (about 139,000 neurons), and it has a published whole-brain spiking model
+([Shiu et al. 2024](https://doi.org/10.1038/s41586-024-07763-9)). So we can stroke it in silico,
+cell by cell, and watch.
+
+## What we did
+
+- **Model.** The Shiu et al. leaky integrate-and-fire network on the FlyWire connectome (v783; v630
+  for replication), in Brian2.
+- **Input.** Sugar taste neurons driven at 100 Hz.
+- **Readouts.** Feeding: the proboscis motor neuron MN9. Mood proxy: three serotonergic cells in the
+  subesophageal zone (CB0262 and two CB0892).
+- **Strokes.** Silence every neuron in one brain region (51 regions), remove every synapse in a region
+  (67 regions), round focal strokes with a penumbra, and size-matched random strokes as controls.
+
+## Findings
+
+<p align="center"><img src="docs/figures/fig0_random_vs_targeted.png" width="640" alt="Serotonergic signal relative to intact: 22 random strokes cluster near 1; PRW stroke and CB0246 alone near 0"></p>
+
+1. **Feeding is hard to break.** MN9 survives lesions of 49 of 51 regions. Only the gnathal ganglion
+   (GNG), the taste hub, is a single point of failure.
+2. **A stroke on the prow (PRW) silences serotonin but spares feeding.** All three serotonin cells go
+   to 0 Hz while MN9 stays near normal. **0 of 22** random strokes of the same size do this.
+3. **One relay neuron carries it.** Silencing just CB0246 (FlyWire `720575940632602532`), a
+   cholinergic cell with 169 synapses onto the serotonin cells, does the same: serotonin 0 Hz, MN9
+   64.6 Hz. Round strokes centred on PRW that miss CB0246 (about 100 µm away) leave serotonin firing.
+4. **It replicates.** PRW silences serotonin in 5 of 5 model settings (two connectome versions,
+   synaptic weight 0.25–0.35 mV). CB0246 alone does it in 4 of 5, and cuts it by 80–93% in the fifth.
+5. **It survives a stress test.** Knocking out each of the 402 PRW neurons one by one finds CB0246
+   as the top hit. The result holds under weight noise and in a second, independent connectome (the
+   Janelia male CNS), where silencing both CB0246 cells removes the serotonin response. See
+   [the stress test](#follow-up-stress-test-of-the-cb0246-result).
+
+**Caveat on "feeding spared":** MN9 lifts the proboscis. The pharyngeal pump motor neurons, which
+swallow, drop 30–55% when CB0246 is silenced and to 0 after the PRW stroke. So the stroke spares
+reaching for food, not all of feeding.
+
+**Takeaway:** what a stroke does depends on which cell it cuts, not just where it lands. This is the
+cellular version of "disconnection, not location" from human lesion network mapping.
+
+**Testable prediction:** silencing CB0246 in a real fly should abolish sugar-evoked activity in
+CB0262/CB0892 while proboscis extension stays normal.
+
+### Figures
+
+| | |
+|---|---|
+| <img src="docs/figures/fig3_stroke_atlas.png" width="420"><br>**Stroke atlas.** Every region lesion, feeding vs serotonin. Only GNG and PRW leave the cloud. | <img src="docs/figures/fig4_bottleneck.png" width="420"><br>**The bottleneck.** CB0246 alone silences the three serotonin cells; neighbouring cells don't. Feeding is unchanged. |
+| <img src="docs/figures/fig5_replication.png" width="420"><br>**Replication** across connectome versions and synaptic weights. | <img src="docs/figures/fig6_round_strokes.png" width="420"><br>**Round strokes on PRW.** Only the largest (r60 + penumbra) silences serotonin, and so does 1 of 10 size-matched random strokes. Round strokes alone are not location-specific. |
+| <img src="docs/figures/fig1_dose_response.png" width="420"><br>**Model check.** Sugar dose drives MN9 as in Shiu et al. | <img src="docs/figures/fig2_wsyn_phase.png" width="420"><br>**Model audit.** Reward dopamine (PAM) cells join only when the whole brain ignites. |
+
+Supplementary: [SEZ monoamine readout and PAM membrane potential](docs/figures/figS1_sez_pamvm.png).
 
 Readout IDs (v783): MN9 `720575940660219265`; 5-HT cells `720575940636895406`,
 `720575940631179831`, `720575940628676457`.
+
+## Status
+
+Preprint in preparation. Results are from a simulation and have not been tested in flies yet.
+Feedback, replication attempts and wet-lab collaborators are welcome: open an issue.
+
+The Python package is still called `ffsim` (the project's working name).
 
 ## Quick start
 
 Requires Python 3.11 and [uv](https://github.com/astral-sh/uv).
 
 ```bash
-git clone <this repo> ffsim && cd ffsim
+git clone https://github.com/UditAkhourii/StrokeSim.git && cd StrokeSim
 uv venv --python 3.11 .venv
 uv pip install --python .venv/bin/python -r requirements.txt
 scripts/download_data.sh          # ~ several GB; idempotent
@@ -78,6 +128,7 @@ ffsim/            library
   readouts.py     readout panels from FlyWire annotations (PAM, PPL, MBON, SEZ)
 experiments/      one script per experiment (see table)
 scripts/          data download + derived-table builder
+docs/             README figures and the explainer video
 results_summary/  small CSVs behind the paper's numbers (full outputs go to results/, ignored)
 ```
 
@@ -97,6 +148,8 @@ results_summary/  small CSVs behind the paper's numbers (full outputs go to resu
 | `a3_cb0246_bottleneck.py` | Finding 3: CB0246 single-neuron silencing | `results/a3/` |
 | `a5r_replication.py` | Finding 3: v630 + W_syn replication; round-stroke null | `results/replication/` |
 | `a4_pruning.py` | Exploratory (synaptic pruning), not in the paper | `results/a4/` |
+| `paper_figures.py` | Figures 3–6 (needs full `results/`) | given dir |
+| `readme_figures.py` | Headline figure, from `results_summary/` only | `docs/figures/` |
 
 Exact commands, in order, are in [REPRODUCE.md](REPRODUCE.md). `results_summary/` holds the small
 CSVs that back the numbers above, including `a1b_random400_null.csv` (MN9 and 5-HT rates per random
